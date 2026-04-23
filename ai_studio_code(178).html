@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafío: El Arquitecto</title>
+
+<!-- IMPORTACIÓN DE KATEX PARA RENDERIZAR LATEX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+/* RESET Y SCROLL LIBRE */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1117;color:#f0f0f0;overflow-x:hidden;overflow-y:auto}
+
+/* SLIDES */
+.slide{display:none;min-height:100vh;padding:60px 80px 120px;flex-direction:column;justify-content:center}
+.slide.active{display:flex}
+
+/* PORTADA */
+#s0{align-items:center;text-align:center}
+#s0 .big{font-size:52px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:14px}
+#s0 .sub{font-size:22px;color:#fbbf24;margin-bottom:14px;letter-spacing:1px}
+#s0 .context{font-size:16px;color:#94a3b8;max-width:720px;line-height:1.7;margin-top:24px}
+#s0 .tag{display:inline-block;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 18px;font-size:14px;color:#94a3b8;margin-top:24px}
+
+/* HEADERS */
+.seg-bar{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.seg-badge{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 16px;border-radius:20px}
+.seg-time{font-size:13px;color:#64748b}
+h2{font-size:34px;font-weight:700;color:#fff;margin-bottom:22px;line-height:1.2}
+
+/* CARDS GENERALES */
+.parts{display:grid;gap:16px}
+.part{border-radius:10px;padding:20px 24px;border:1px solid #1e293b;background:#13192a}
+.part-title{font-size:18px;font-weight:700;color:#38bdf8;margin-bottom:12px}
+.part p{font-size:16px;line-height:1.65;color:#e2e8f0;margin-bottom:10px}
+.part ul{padding-left:22px;margin-top:8px;margin-bottom:10px}
+.part li{font-size:15px;line-height:1.7;color:#cbd5e1;margin-bottom:6px}
+
+/* CÓDIGO DE CONSTRUCCIÓN (REGLAS) */
+.rules-box{background:#1c1200;border:1px solid #f59e0b;border-radius:10px;padding:24px;margin-top:16px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+.rules-title{font-size:16px;font-weight:700;color:#f59e0b;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.rule-item{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.rule-num{background:#f59e0b;color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.rule-text{font-size:16px;color:#e2e8f0;line-height:1.5}
+.rule-math{font-family:'Courier New',Courier,monospace;color:#fbbf24;font-weight:700;background:#2d1f00;padding:2px 6px;border-radius:4px}
+
+/* PERSONAJES/CONFLICTOS */
+.conflict{border-radius:8px;padding:18px 22px;font-size:16px;color:#cbd5e1;margin-bottom:16px;border-left:4px solid #ef4444;background:#2d0000;line-height:1.6}
+.conflict span{display:block;font-style:normal;font-size:13px;color:#fca5a5;margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+
+/* BOTONES DE REVELADO (Para el profesor al final) */
+.rev-btn{font-size:13px;background:#334155;border:none;color:#f8fafc;padding:8px 16px;border-radius:6px;cursor:pointer;margin-top:12px;font-weight:600;transition:background .2s}
+.rev-btn:hover{background:#475569}
+.rev-ans{display:none;margin-top:16px;font-size:15px;line-height:1.6;padding:16px 20px;border-radius:8px;background:#052e16;color:#86efac;border-left:4px solid #16a34a}
+
+/* NAV INFERIOR */
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 40px;background:#090c12;border-top:1px solid #1e293b;z-index:100}
+nav button{background:#1e293b;border:none;color:#f8fafc;padding:8px 20px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:600;transition:background .2s}
+nav button:hover{background:#334155}
+nav button:disabled{opacity:.3;cursor:default}
+.counter{font-size:13px;color:#94a3b8;font-weight:600}
+.dots{display:flex;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#334155;cursor:pointer;transition:background .2s}
+.dot.active{background:#e2e8f0}
+</style>
+</head>
+<body>
+
+<!-- S0 PORTADA -->
+<div class="slide active" id="s0">
+  <div class="big">El Desafío del Arquitecto</div>
+  <div class="sub">Modelamiento y Argumentación</div>
+  <div class="context">La constructora los acaba de contratar para diseñar las escaleras de emergencia de un nuevo edificio de gran altura. No es un trabajo de cálculo simple; deberán coordinarse con proveedores, ingenieros y contratistas, asegurándose de no violar la estricta normativa de construcción.</div>
+  <div class="tag">M1 · Divisibilidad · Ecuaciones y Paridad</div>
+</div>
+
+<!-- S1 LAS REGLAS -->
+<div class="slide" id="s1">
+  <div class="seg-bar">
+    <span class="seg-badge" style="background:#2d1f00;color:#fbbf24">La Base</span>
+  </div>
+  <h2>El Código de Construcción</h2>
+  <p style="font-size:16px;color:#94a3b8;margin-bottom:10px">Antes de iniciar cualquier diseño, la municipalidad exige que se cumplan estrictamente estas tres reglas estructurales:</p>
+  
+  <div class="rules-box">
+    <div class="rules-title">📜 Normativa Vigente</div>
+    <div class="rule-item">
+      <div class="rule-num">1</div>
+      <div class="rule-text">La altura total de cada piso completo ($H$) debe medir <b>entre 250 cm y 400 cm</b>.</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">2</div>
+      <div class="rule-text">La altura de cada peldaño individual ($h$) debe ser un número <b>entero exacto</b> en centímetros.</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">3</div>
+      <div class="rule-text">Por diseño antisísmico del descanso, la cantidad total de peldaños por piso ($n$) DEBE ser un <b>número impar mayor que 10</b>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- S2 MISIÓN 1 -->
+<div class="slide" id="s2">
+  <div class="seg-bar">
+    <span class="seg-badge" style="background:#0c1a2e;color:#7dd3fc">Misión 1</span>
+  </div>
+  <h2>El Proveedor de Materiales</h2>
+  <div class="parts">
+    <div class="part">
+      <p>Llamas al proveedor de concreto y te informa que, por el momento, solo le quedan peldaños prefabricados que miden exactamente <b>18 cm de altura</b>.</p>
+      <p>Decides utilizarlos para tu diseño.</p>
+      <br>
+      <div class="part-title">Tu tarea:</div>
+      <p>Respetando las 3 reglas del Código de Construcción, <b>¿cuáles son todas las alturas de piso ($H$) legalmente posibles que puedes construir?</b></p>
+      <p style="color:#64748b;font-size:14px;margin-top:16px">Escriban el desarrollo y las opciones válidas en sus cuadernos.</p>
+      
+      <!-- Botón solo para el profe en el plenario -->
+      <button class="rev-btn" onclick="toggle('rev1')">Mostrar Resolución</button>
+      <div class="rev-ans" id="rev1">
+        Se sabe que $H = n \cdot 18$.<br>
+        Por la Regla 3, $n$ debe ser impar y mayor que 10 ($n = 11, 13, 15, 17, 19, 21...$).<br>
+        Evaluando para cumplir la Regla 1 ($250 \le H \le 400$):<br>
+        • Si $n=11 \rightarrow H = 198$ (Falla)<br>
+        • Si $n=13 \rightarrow H = 234$ (Falla)<br>
+        • Si $n=15 \rightarrow H = 270$ cm <b>(Válida)</b><br>
+        • Si $n=17 \rightarrow H = 306$ cm <b>(Válida)</b><br>
+        • Si $n=19 \rightarrow H = 342$ cm <b>(Válida)</b><br>
+        • Si $n=21 \rightarrow H = 378$ cm <b>(Válida)</b><br>
+        • Si $n=23 \rightarrow H = 414$ (Falla)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S3 MISIÓN 2 -->
+<div class="slide" id="s3">
+  <div class="seg-bar">
+    <span class="seg-badge" style="background:#2d0000;color:#fca5a5">Misión 2</span>
+  </div>
+  <h2>El Conflicto con el Ascensor</h2>
+  <div class="parts">
+    <div class="part">
+      <div class="conflict">
+        <span>Ingeniero de Ascensores:</span>
+        "Para que el sistema de evacuación funcione, necesito programar el ascensor para que se detenga <b>exactamente a la mitad de la altura del piso</b> ($H/2$). Además, al abrir sus puertas ahí, el piso del ascensor debe quedar perfectamente alineado (a ras) con uno de tus peldaños."
+      </div>
+      <div class="part-title">Tu tarea:</div>
+      <p>Como arquitecto a cargo, debes responderle al ingeniero si esto es factible o no.</p>
+      <p><b>¿Es posible cumplir su petición respetando el Código de Construcción?</b> Demuestra tu respuesta lógicamente sin probar números específicos.</p>
+      
+      <button class="rev-btn" onclick="toggle('rev2')">Mostrar Resolución</button>
+      <div class="rev-ans" id="rev2">
+        <b>Es matemáticamente imposible.</b><br>
+        Para que el ascensor quede a ras con un peldaño a la mitad del piso, la cantidad total de peldaños ($n$) debe poder dividirse exactamente en 2 (es decir, $n/2$ debe ser un número entero).<br>
+        Sin embargo, la Regla 3 exige que $n$ sea <b>IMPAR</b>. Un número impar nunca es divisible por 2, por lo que la mitad del piso siempre quedará "flotando" en medio de la altura de un peldaño, nunca a ras.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S4 MISIÓN 3 -->
+<div class="slide" id="s4">
+  <div class="seg-bar">
+    <span class="seg-badge" style="background:#052e16;color:#86efac">Misión 3</span>
+  </div>
+  <h2>El Contratista de Yeso</h2>
+  <div class="parts">
+    <div class="part">
+      <div class="conflict" style="background:#021008;border-color:#16a34a">
+        <span style="color:#86efac">Contratista de Interiores:</span>
+        "Las planchas de yeso que importamos vienen en medidas estándar. Para no tener que cortarlas y perder material, necesito que la altura total del piso que diseñes ($H$) sea estrictamente un <b>múltiplo de 4</b>."
+      </div>
+      <div class="part-title">Tu tarea:</div>
+      <p>Sabemos que la altura total se calcula multiplicando la cantidad de peldaños por su altura ($H = n \cdot h$).</p>
+      <p>Si aceptas la condición del contratista y además mantienes el Código de Construcción, <b>¿qué condición matemática obligatoria deberá cumplir la altura de tu peldaño ($h$)?</b></p>
+      <p style="margin-top:10px">Explica paso a paso tu deducción usando reglas de divisibilidad.</p>
+      
+      <button class="rev-btn" onclick="toggle('rev3')">Mostrar Resolución</button>
+      <div class="rev-ans" id="rev3">
+        Sabemos que $H = n \cdot h$.<br>
+        Se exige que $H$ sea múltiplo de 4. Para que una multiplicación dé como resultado un múltiplo de 4, el factor 4 debe provenir de $n$, de $h$, o de ambos.<br>
+        Por la Regla 3, $n$ es obligatoriamente <b>impar</b>. Un número impar no tiene factores de 2 ni de 4.<br>
+        Por lo tanto, la divisibilidad por 4 debe recaer <b>exclusivamente</b> en la altura del peldaño.<br>
+        <b>Conclusión:</b> La altura del peldaño ($h$) debe ser obligatoriamente un múltiplo de 4 (ej: 16 cm, 20 cm, 24 cm).
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S5 CIERRE -->
+<div class="slide" id="s5">
+  <div class="seg-bar">
+    <span class="seg-badge" style="background:#1e293b;color:#cbd5e1">Plenario</span>
+  </div>
+  <h2>Revisión de Proyectos</h2>
+  <div class="parts">
+    <div class="part" style="background:transparent;border:none;text-align:center;padding-top:40px">
+      <p style="font-size:24px;color:#94a3b8;margin-bottom:20px">Preparen a sus voceros.</p>
+      <p style="font-size:18px;color:#cbd5e1">Discutiremos en la pizarra cómo lograron resolver los conflictos con los contratistas.</p>
+    </div>
+  </div>
+</div>
+
+<!-- NAVEGACIÓN -->
+<nav>
+  <button id="btn-prev" onclick="move(-1)" disabled>← Anterior</button>
+  <div style="display:flex;align-items:center;gap:18px">
+    <div class="dots" id="dots"></div>
+    <span class="counter" id="counter">1 / 6</span>
+  </div>
+  <button id="btn-next" onclick="move(1)">Siguiente →</button>
+</nav>
+
+<script>
+// CONFIGURACIÓN DE KATEX (Renderizador Matemático)
+document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+        delimiters:[
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+    });
+});
+
+// NAVEGACIÓN BÁSICA DE DIAPOSITIVAS
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+const dotsEl = document.getElementById('dots');
+
+for(let i=0; i<total; i++){
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0 ? ' active' : '');
+  d.onclick = () => go(i);
+  dotsEl.appendChild(d);
+}
+
+function go(n){
+  slides[cur].classList.remove('active');
+  dotsEl.children[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(n, total-1));
+  slides[cur].classList.add('active');
+  dotsEl.children[cur].classList.add('active');
+  document.getElementById('counter').textContent = (cur+1) + ' / ' + total;
+  document.getElementById('btn-prev').disabled = cur === 0;
+  document.getElementById('btn-next').disabled = cur === total-1;
+  window.scrollTo(0,0); 
+}
+
+function move(d){ go(cur+d); }
+
+// Avanzar con flechas izquierda y derecha
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight') move(1);
+  if(e.key === 'ArrowLeft') move(-1);
+});
+
+// MOSTRAR/OCULTAR RESPUESTAS Y EJECUTAR KATEX EN EL ELEMENTO MOSTRADO
+function toggle(id){
+  const el = document.getElementById(id);
+  if(el.style.display === 'block'){
+    el.style.display = 'none';
+  } else {
+    el.style.display = 'block';
+    // Le decimos a KaTeX que renderice el nuevo contenido visible por si acaso
+    renderMathInElement(el, {
+        delimiters:[
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+    });
+  }
+}
+</script>
+</body>
+</html>
